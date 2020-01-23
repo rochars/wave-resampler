@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>wave-resampler tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://unpkg.com/mocha@4.0.1/mocha.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+</head>
+<body>
+
+  <div class="container">
+    <h1>wave-resampler</h1>
+    <p>
+      Copyright (c) 2019 Rafael da Silva Rocha.<br>
+      <a href="https://github.com/rochars/wave-resampler">
+        https://github.com/rochars/wave-resampler
+      </a>
+    </p>
+  </div>
+
+  <!-- Load UMD -->
+  <script src="../dist/wave-resampler.js"></script>
+
+  <!-- Load Chai and Mocha -->
+  <div class="container">
+    <div id="mocha"></div>
+  </div>
+  <script src="https://www.chaijs.com/chai.js"></script>
+  <script src="https://unpkg.com/mocha@6.2.2/mocha.js"></script>
+  
+  <script>
+    var assert = chai.assert;
+    var resample = waveResampler.resample;
+    mocha.setup('bdd')
+  </script>
+
+  <!-- Load the tests -->
+  <script src="dist/interface.js"></script>
+
+  <!-- Run the tests -->
+  <script>
+    mocha.globals([ 'script*' ]).run();
+  </script>
+
+</body>
+</html>

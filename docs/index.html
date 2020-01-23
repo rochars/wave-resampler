@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#resample">resample</a></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme">
+        <article><h1>wave-resampler</h1>
+<p>Copyright (c) 2019 Rafael da Silva Rocha.<br>
+https://github.com/rochars/wave-resampler</p>
+<p><a href="https://www.npmjs.com/package/wave-resampler"><img src="https://img.shields.io/npm/v/wave-resampler.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wave-resampler/docs"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rochars.github.io/wave-resampler/test/index.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br>
+<a href="https://codecov.io/gh/rochars/wave-resampler"><img src="https://img.shields.io/codecov/c/github/rochars/wave-resampler.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wave-resampler"><img src="https://img.shields.io/travis/rochars/wave-resampler.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wave-resampler"><img src="https://img.shields.io/appveyor/ci/rochars/wave-resampler.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wave-resampler/"><img src="https://img.shields.io/scrutinizer/g/rochars/wave-resampler.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a></p>
+<p>PCM audio resampler written entirely in JavaScript.</p>
+<h2>Install</h2>
+<pre class="prettyprint source"><code>npm install wave-resampler
+</code></pre>
+<h2>Use</h2>
+<h3>Node</h3>
+<pre class="prettyprint source lang-javascript"><code>const waveResampler = require('wave-resampler');
+// resample 48kHz samples to 44.1kHz
+let newSamples = waveResampler.resample(samples, 48000, 44100);
+</code></pre>
+<p>or</p>
+<pre class="prettyprint source lang-javascript"><code>import { resampler } from 'wave-resampler';
+let newSamples = resample(samples, 48000, 44100);
+</code></pre>
+<h3>Browser</h3>
+<p>Use the <strong>wave-resampler.js</strong> file in the <em>dist</em> folder:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;wave-resampler.js&quot;>&lt;/script>
+&lt;script>
+  var newSamples = waveResampler.resample(samples, 48000, 44100);
+&lt;/script>
+</code></pre>
+<p>Or load it from the <a href="https://cdn.jsdelivr.net/npm/wave-resampler">jsDelivr</a> CDN:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wave-resampler&quot;>&lt;/script>
+</code></pre>
+<p>Or load it from <a href="https://unpkg.com/wave-resampler">unpkg</a>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wave-resampler&quot;>&lt;/script>
+</code></pre>
+<h2>Advanced use</h2>
+<h3>Resampling methods</h3>
+<ul>
+<li><strong>point</strong>: Nearest point interpolation, lowest quality, no LPF by default, fastest</li>
+<li><strong>linear</strong>: Linear interpolation, low quality, no LPF by default, fast</li>
+<li><strong>cubic</strong>: Cubic interpolation, use LPF by default <strong>(default method)</strong></li>
+<li><strong>sinc</strong>: Windowed sinc interpolation, use LPF by default, slowest</li>
+</ul>
+<p>To use a different interpolation method:</p>
+<pre class="prettyprint source lang-javascript"><code>// Will use 'sinc' method
+resample(48000, 44100, {method: &quot;sinc&quot;});
+
+// Will use 'linear' method
+resample(48000, 44100, {method: &quot;linear&quot;});
+</code></pre>
+<h3>LPF</h3>
+<p>You can turn the LPF on and off for any resampling method:</p>
+<pre class="prettyprint source lang-javascript"><code>// Will use 'sinc' method with no LPF
+let newSamples = resample(48000, 44100, {method: &quot;sinc&quot;, LPF: false});
+
+// Will use 'linear' method with LPF
+let newSamples = resample(48000, 44100, {method: &quot;linear&quot;, LPF: true});
+</code></pre>
+<p>The default LPF is a IIR LPF. You may define what type of LPF will be used
+by changing the LPFType attribute on the <em>toSampleRate()</em> param.
+You can use <strong>IIR</strong> or <strong>FIR</strong>:</p>
+<pre class="prettyprint source lang-javascript"><code>// Will use 'linear' method with a FIR LPF
+let newSamples = resample(48000, 44100,
+  {method: &quot;linear&quot;, LPF: true, LPFType: 'FIR'});
+
+// Will use 'linear' method with a IIR LPF, the default
+let newSamples = resample(48000, 44100,
+  {method: &quot;linear&quot;, LPF: true});
+</code></pre>
+<p>You can change the order of the LPF for both IIR and FIR with
+the attribute LPFOrder:</p>
+<pre class="prettyprint source lang-javascript"><code>let newSamples = resample(48000, 44100,
+  {method: &quot;linear&quot;, LPF: true, LPFType: 'IIR', LPFOrder: 2});
+</code></pre>
+<p>The default order for IIR is 16 and for FIR is 71.</p>
+<h2>API</h2>
+<pre class="prettyprint source lang-javascript"><code>/**
+ * Change the sample rate of the samples to a new sample rate.
+ * @param {!Array|!TypedArray} samples The original samples.
+ * @param {number} oldSampleRate The original sample rate.
+ * @param {number} sampleRate The target sample rate.
+ * @param {?Object} details The extra configuration, if needed.
+ * @return {!Float64Array} the new samples.
+ */
+export function resample(samples, oldSampleRate, sampleRate, details={}) {}
+</code></pre>
+<h3>LICENSE</h3>
+<p>Copyright (c) 2019 Rafael da Silva Rocha.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
+    </section>
+
+
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        index.js
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://github.com/rochars/wave-resampler">https://github.com/rochars/wave-resampler</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description">The resample function.</div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

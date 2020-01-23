@@ -1,0 +1,71 @@
+{
+  "name": "wave-resampler",
+  "version": "1.0.0",
+  "description": "PCM audio resampler written entirely in JavaScript.",
+  "homepage": "https://github.com/rochars/wave-resampler",
+  "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
+  "license": "MIT",
+  "main": "./dist/wave-resampler.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "wav",
+    "wave",
+    "BWF",
+    "audio",
+    "PCM",
+    "resampler"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rochars/wave-resampler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rochars/wave-resampler/issues"
+  },
+  "directories": {
+    "dist": "dist",
+    "externs": "externs",
+    "lib": "lib"
+  },
+  "files": [
+    "dist",
+    "externs",
+    "lib",
+    "index.js",
+    "index.d.ts",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "lint": "jshint index.js externs lib test/dist",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist --recursive -R dot --timeout=1600000",
+    "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist --umd --recursive -R dot --timeout=240000",
+    "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
+    "test-dist": "npm run test-umd && npm run test-tsc",
+    "rollup-bundle": "rollup -c && npm run test-dist",
+    "doc": "./node_modules/.bin/jsdoc -c .jsdocrc -d docs -r README.md -t node_modules/docdash",
+    "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
+    "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
+  },
+  "devDependencies": {
+    "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
+    "@rollup/plugin-commonjs": "^11.0.0",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "codecov": "^3.6.1",
+    "docdash": "^1.1.1",
+    "esm": "^3.2.25",
+    "jsdoc": "^3.6.3",
+    "jshint": "^2.10.3",
+    "mocha": "^6.2.2",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^14.1.1",
+    "rollup": "^1.27.14",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {}
+}

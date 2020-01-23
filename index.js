@@ -1,0 +1,171 @@
+/*
+ * Copyright (c) 2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The resample function.
+ * @see https://github.com/rochars/wave-resampler
+ */
+
+import { Interpolator } from './lib/interpolator';
+import { FIRLPF } from './lib/fir-lpf';
+import { ButterworthLPF } from './lib/butterworth-lpf';
+
+/**
+ * Configures wich resampling method uses LPF by default.
+ * @private
+ */
+const DEFAULT_LPF_USE = {
+  'point': false,
+  'linear': false,
+  'cubic': true,
+  'sinc': true
+};
+
+/**
+ * The default orders for the LPF types.
+ * @private
+ */
+const DEFAULT_LPF_ORDER = {
+  'IIR': 16,
+  'FIR': 71
+};
+
+/**
+ * The classes to use with each LPF type.
+ * @private
+ */
+const DEFAULT_LPF = {
+  'IIR': ButterworthLPF,
+  'FIR': FIRLPF
+};
+
+/**
+ * Change the sample rate of the samples to a new sample rate.
+ * @param {!Array|!TypedArray} samples The original samples.
+ * @param {number} oldSampleRate The original sample rate.
+ * @param {number} sampleRate The target sample rate.
+ * @param {?Object} details The extra configuration, if needed.
+ * @return {!Float64Array} the new samples.
+ */
+export function resample(samples, oldSampleRate, sampleRate, details={}) {  
+  // Make the new sample container
+  let rate = ((sampleRate - oldSampleRate) / oldSampleRate) + 1;
+  let newSamples = new Float64Array(samples.length * (rate));
+  // Create the interpolator
+  details.method = details.method || 'cubic';
+  let interpolator = new Interpolator(
+    samples.length,
+    newSamples.length,
+    {
+      method: details.method,
+      tension: details.tension || 0,
+      sincFilterSize: details.sincFilterSize || 6,
+      sincWindow: details.sincWindow || undefined
+    });
+  // Resample + LPF
+  if (details.LPF === undefined) {
+    details.LPF = DEFAULT_LPF_USE[details.method];
+  } 
+  if (details.LPF) {
+    details.LPFType = details.LPFType || 'IIR';
+    const LPF = DEFAULT_LPF[details.LPFType];
+    // Upsampling
+    if (sampleRate > oldSampleRate) {
+      let filter = new LPF(
+        details.LPFOrder || DEFAULT_LPF_ORDER[details.LPFType],
+        sampleRate,
+        (oldSampleRate / 2));
+      upsample_(
+        samples, newSamples, interpolator, filter);
+    // Downsampling
+    } else {
+      let filter = new LPF(
+        details.LPFOrder || DEFAULT_LPF_ORDER[details.LPFType],
+        oldSampleRate,
+        sampleRate / 2);
+      downsample_(
+        samples, newSamples, interpolator, filter);
+    }
+  // Resample, no LPF
+  } else {
+    resample_(samples, newSamples, interpolator);
+  }
+  return newSamples;
+}
+
+/**
+ * Resample.
+ * @param {!Array|!TypedArray} samples The original samples.
+ * @param {!Float64Array} newSamples The container for the new samples.
+ * @param {Object} interpolator The interpolator.
+ * @private
+ */
+function resample_(samples, newSamples, interpolator) {
+  // Resample
+  for (let i = 0, len = newSamples.length; i < len; i++) {
+    newSamples[i] = interpolator.interpolate(i, samples);
+  }
+}
+
+/**
+ * Upsample with LPF.
+ * @param {!Array|!TypedArray} samples The original samples.
+ * @param {!Float64Array} newSamples The container for the new samples.
+ * @param {Object} interpolator The interpolator.
+ * @param {Object} filter The LPF object.
+ * @private
+ */
+function upsample_(samples, newSamples, interpolator, filter) {
+  // Resample and filter
+  for (let i = 0, len = newSamples.length; i < len; i++) {
+    newSamples[i] = filter.filter(interpolator.interpolate(i, samples));
+  }
+  // Reverse filter
+  filter.reset();
+  for (let i = newSamples.length - 1; i >= 0; i--) {
+    newSamples[i]  = filter.filter(newSamples[i]);
+  }
+}
+
+/**
+ * Downsample with LPF.
+ * @param {!Array|!TypedArray} samples The original samples.
+ * @param {!Float64Array} newSamples The container for the new samples.
+ * @param {Object} interpolator The interpolator.
+ * @param {Object} filter The LPF object.
+ * @private
+ */
+function downsample_(samples, newSamples, interpolator, filter) {
+  // Filter
+  for (let i = 0, len = samples.length; i < len; i++) {
+    samples[i]  = filter.filter(samples[i]);
+  }
+  // Reverse filter
+  filter.reset();
+  for (let i = samples.length - 1; i >= 0; i--) {
+    samples[i]  = filter.filter(samples[i]);
+  }
+  // Resample
+  resample_(samples, newSamples, interpolator);
+}

@@ -1,0 +1,24 @@
+environment:
+  matrix:
+    - nodejs_version: "8"
+    - nodejs_version: "9"
+    - nodejs_version: "10"
+    - nodejs_version: "12"
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm -g install npm@latest
+  - npm install
+  - npm install -g
+
+test_script:
+  - node --version
+  - npm --version
+  - cmd: npm run build
+
+build: off
+
+version: "{build}"
+
+matrix:
+  fast_finish: true

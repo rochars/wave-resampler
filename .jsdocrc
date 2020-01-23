@@ -1,0 +1,12 @@
+{
+  "source": {
+    "include": [
+      "index.js"
+    ]
+  },
+  "templates": {
+    "default": {
+      "includeDate": false
+    }
+  }
+}
